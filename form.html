@@ -7,7 +7,7 @@
     <title>Form Pendaftaran</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body oncontextmenu="return false;">
 <div class="container mt-5">
     <h2 class="text-center mb-4">Form Pendaftaran</h2>
     <form>
@@ -45,7 +45,7 @@
             <label for="foto" class="form-label">Unggah Foto</label>
             <input type="file" class="form-control" id="foto" name="foto" required>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -68,10 +68,36 @@ const firebaseConfig = {
 
 // Inisialisasi Firebase
 firebase.initializeApp(firebaseConfig);
+let submitCount = localStorage.getItem("submitCount");
+if (submitCount > 3) {
+      document.getElementById("submitButton").style.visibility = "hidden"; // Disable tombol
+      alert("Anda mencoba lebih dari 5 kali. Tombol submit telah dinonaktifkan.");
+}
+
+function updateSubmitCount() {
+        // Ambil jumlah klik yang sudah tersimpan di localStorage
+        let submitCount = localStorage.getItem("submitCount");
+
+        // Jika belum ada nilai, mulai dengan 0
+        if (submitCount === null) {
+            submitCount = 0;
+        }
+
+        // Tambah 1 pada jumlah klik
+        submitCount++;
+
+        // Simpan kembali ke localStorage
+        localStorage.setItem("submitCount", submitCount);
+
+        // Menampilkan jumlah klik (opsional)
+        console.log("Tombol Submit telah ditekan " + submitCount + " kali.");
+        
+    }
 
 // Event Listener untuk Submit Form
 document.querySelector("form").addEventListener("submit", (e) => {
   e.preventDefault();
+  updateSubmitCount();
 
   // Ambil data dari form
   const nomorRegistrasi = document.getElementById("nomor_registrasi").value;

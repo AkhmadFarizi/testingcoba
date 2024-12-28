@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Pendaftaran</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Form Pendaftaran</h2>
+    <form>
+        <div class="mb-3">
+            <label for="nomor_registrasi" class="form-label">Nomor Registrasi</label>
+            <input type="text" class="form-control" id="nomor_registrasi" name="nomor_registrasi" required>
+        </div>
+        <div class="mb-3">
+            <label for="nama" class="form-label">Nama</label>
+            <input type="text" class="form-control" id="nama" name="nama" required>
+        </div>
+        <div class="mb-3">
+            <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
+            <select class="form-control" id="jenis_kelamin" name="jenis_kelamin" required>
+                <option value="PEREMPUAN">Perempuan</option>
+                <option value="LAKI-LAKI">Laki-Laki</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="kompetensi" class="form-label">Kompetensi</label>
+            <input type="text" class="form-control" id="kompetensi" name="kompetensi" required>
+        </div>
+        <div class="mb-3">
+            <label for="berlaku_sampai" class="form-label">Berlaku Sampai</label>
+            <input type="text" class="form-control" id="berlaku_sampai" name="berlaku_sampai" required>
+        </div>
+        <div class="mb-3">
+            <label for="status_dokumen" class="form-label">Status Dokumen</label>
+            <select class="form-control" id="status_dokumen" name="status_dokumen" required>
+                <option value="AKTIF">Aktif</option>
+                <option value="NON-AKTIF">Non-Aktif</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="foto" class="form-label">Unggah Foto</label>
+            <input type="file" class="form-control" id="foto" name="foto" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-storage.js"></script>
+<script>
+    // Konfigurasi Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyA6Vlz5pyII3kk-P4ZbxwEchUJfnP92NAI",
+  authDomain: "e-partisher-20.firebaseapp.com",
+  databaseURL: "https://e-partisher-20-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "e-partisher-20",
+  storageBucket: "e-partisher-20.appspot.com",
+  messagingSenderId: "268293834104",
+  appId: "1:268293834104:web:e7ea2bbfc5df7638ea348d",
+  measurementId: "G-KNFNM852W0"
+};
+
+// Inisialisasi Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Event Listener untuk Submit Form
+document.querySelector("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  // Ambil data dari form
+  const nomorRegistrasi = document.getElementById("nomor_registrasi").value;
+  const nama = document.getElementById("nama").value;
+  const jenisKelamin = document.getElementById("jenis_kelamin").value;
+  const kompetensi = document.getElementById("kompetensi").value;
+  const berlakuSampai = document.getElementById("berlaku_sampai").value;
+  const statusDokumen = document.getElementById("status_dokumen").value;
+  const foto = document.getElementById("foto").files[0];
+
+  // Unggah foto ke Firebase Storage
+  const storageRef = firebase.storage().ref(`photos/${foto.name}`);
+  storageRef.put(foto).then((snapshot) => {
+    console.log("Foto berhasil diunggah:", snapshot);
+
+    // Dapatkan URL foto
+    storageRef.getDownloadURL().then((fotoUrl) => {
+      console.log("URL Foto:", fotoUrl);
+
+      // Simpan data ke Firebase Realtime Database
+      const databaseRef = firebase.database().ref("registrations");
+      databaseRef.set(
+        {
+          nomorRegistrasi,
+          nama,
+          jenisKelamin,
+          kompetensi,
+          berlakuSampai,
+          statusDokumen,
+          fotoUrl,
+        },
+        (error) => {
+          if (error) {
+            console.error("Error menyimpan data:", error);
+            alert("Terjadi kesalahan saat menyimpan data.");
+          } else {
+            console.log("Data berhasil disimpan ke database");
+            alert("Data berhasil disimpan!");
+          }
+        }
+      );
+    });
+  }).catch((error) => {
+    console.error("Error mengunggah foto:", error);
+    alert("Terjadi kesalahan saat mengunggah foto.");
+  });
+});
+
+</script>
+</body>
+</html>
+
+
+
